@@ -1,3 +1,11 @@
+"""
+Description:
+This Python script builds and trains an XGBoost Classifier to classify hospital-acquired infections (HAI) with or without urinary tract infections (UTI). 
+It handles data preprocessing through imputation, one-hot encoding, and scaling, and addresses class imbalance using SMOTE. 
+The script evaluates the model at various thresholds using metrics such as accuracy, specificity, precision, sensitivity, F1 score, AUC, and cross-validation accuracy. 
+It also includes an option to plot the ROC curve for visualizing model performance.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score

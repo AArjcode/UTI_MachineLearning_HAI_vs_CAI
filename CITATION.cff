@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the article below."
+title: "Machine Learning for Healthcare- vs. Community-Associated Urinary Tract Infections"
+authors:
+  - family-names: Arjmand
+    given-names: Arash
+repository-code: "https://github.com/AArjcode/UTI_MachineLearning_HAI_vs_CAI"
+preferred-citation:
+  type: article
+  title: "Comparative analysis of machine learning models for predicting hospital- and community-associated urinary tract infections using demographic, hospital, and socioeconomic predictors"
+  authors:
+    - family-names: Arjmand
+      given-names: A.
+    - family-names: Bani-Yaghoub
+      given-names: M.
+    - family-names: Sutkin
+      given-names: G.
+    - family-names: Corkran
+      given-names: K.
+    - family-names: Paschal
+      given-names: S.
+  journal: "Journal of Hospital Infection"
+  volume: 162
+  start: 263
+  end: 271
+  year: 2025
+  doi: "10.1016/j.jhin.2025.04.024"

@@ -18,7 +18,10 @@ from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
 # Load the data
-file_path = r'C:\Users\...
+import sys
+if len(sys.argv) < 2:
+    sys.exit(f'Usage: python {sys.argv[0]} <data.xlsx>')
+file_path = sys.argv[1]
 data = pd.read_excel(file_path)
 
 # Define predictors and target variable
@@ -111,7 +114,7 @@ final_model_sm = sm.Logit(y_train, sm.add_constant(X_train[resulting_features]))
 
 # Calculate the odds ratios and 95% confidence intervals
 params = final_model_sm.params
-conf = final_model_sm.conf_int()
+conf = np.exp(final_model_sm.conf_int())  # CI limits on the odds-ratio scale
 conf['OR'] = np.exp(params)
 conf.columns = ['2.5%', '97.5%', 'OR']
 

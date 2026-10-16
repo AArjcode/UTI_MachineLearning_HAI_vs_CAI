@@ -15,7 +15,10 @@ from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
 
 # Load the data (update file_path as per your directory structure)
-file_path = r'C:\Users\...
+import sys
+if len(sys.argv) < 2:
+    sys.exit(f'Usage: python {sys.argv[0]} <data.xlsx>')
+file_path = sys.argv[1]
 data = pd.read_excel(file_path)
 
 # Define predictors and target variable
@@ -106,7 +109,7 @@ for threshold in [0.5, 0.4, 0.3, 0.2, 0.1]:
 # Optionally, plot the ROC curve
 fpr, tpr, thresholds = roc_curve(y_test, y_prob)
 plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {auc:.2f})')
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc_score(y_test, y_prob):.2f})')
 plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])

@@ -1,45 +1,94 @@
-# UTI_MachineLearning_HAI_vs_CAI
-**Comparative Analysis of Machine Learning Models for Predicting Hospital- and Community-Acquired Urinary Tract Infections
-**Description
-This project compares machine learning models to predict and distinguish between hospital-acquired (HAI) and community-acquired (CAI) urinary tract infections (UTIs). The study also differentiates between HAI patients with and without UTIs. The models use demographic, hospital, and socioeconomic predictors to enhance the accuracy of predictions and help healthcare providers implement timely interventions.
+# Machine Learning for Healthcare- vs. Community-Associated Urinary Tract Infections
 
-The following machine learning models were applied:
+Python code for a comparative study of five machine-learning models that predict urinary tract infection (UTI) outcomes from demographic, hospital and socioeconomic predictors in electronic health records, 2019–2023.
 
-Decision Tree (DT)
-Neural Network (NN)
-Logistic Regression (LR)
-Random Forest (RF)
-Extreme Gradient Boosting (XGBoost)
-This repository includes the code, data preprocessing steps, and model evaluations used in the analysis.
+> Arjmand A, Bani-Yaghoub M, Sutkin G, Corkran K, Paschal S. Comparative analysis of machine learning models for predicting hospital- and community-associated urinary tract infections using demographic, hospital, and socioeconomic predictors. *Journal of Hospital Infection*. 2025;162:263–271. [doi:10.1016/j.jhin.2025.04.024](https://doi.org/10.1016/j.jhin.2025.04.024)
 
-Project Goals
-Compare the effectiveness of machine learning models in predicting HAI vs. CAI UTIs.
-Identify key predictors such as nurse units, hospital locations, and socioeconomic factors.
-Provide insights into the performance of different models, focusing on sensitivity, accuracy, and interpretability.
-Installation Instructions
-To run this project, you'll need the following installed:
+## Study design
 
-Python 3.x
-scikit-learn
-pandas
-numpy
-matplotlib
-xgboost
-Usage
-Data Preprocessing: The dataset from 2019-2023 was sourced from Cerner Corporation, with patient demographics, hospital locations, and socioeconomic factors. Preprocessing steps include handling missing values, recoding nurse units, and applying SMOTE for class imbalance.
+The study has two classification tasks, each analysed separately for every year from 2019 to 2023:
 
-Model Training: Run the scripts provided to train the models:
+1. **HA-UTI vs. UTI-free:** patients with a healthcare-associated infection, with vs. without a UTI
+2. **HA-UTI vs. CA-UTI:** among UTI patients, healthcare- vs. community-associated
 
-Logistic Regression: LR_HAI.py
-Decision Tree: dDRT_HAI.py
-Neural Network: NN_HAI.py
-Random Forest: RF_HAI.py
-XGBoost: xgboost_HAI.py
-Evaluation: The models are evaluated using accuracy, sensitivity, specificity, F1 score, and AUC. Results are presented in tables and figures summarizing the performance across five years.
+| Predictor group | Variables |
+|---|---|
+| Demographic | age, gender, ethnicity, employment status, marital status |
+| Hospital | hospital location, nurse unit (both grouped into broader categories) |
+| Socioeconomic (by ZIP code of residence) | poverty rate, median household income, share with a graduate degree, population density |
 
-Results
-Logistic Regression: Achieved the highest overall accuracy and AUC across most years.
-Decision Tree: Showed the highest sensitivity, particularly useful for identifying positive cases, though it had lower precision.
-Random Forest: Balanced performance with high precision and F1 score, excelling in cross-validation stability.
-Neural Network: Demonstrated high specificity, effectively identifying negative cases.
-XGBoost: Provided strong performance in AUC, especially with structured data, but required more computational resources.
+## Models
+
+| Script | Model | Class imbalance | Validation |
+|---|---|---|---|
+| [`Src/LR_HAI.py`](Src/LR_HAI.py) | Stepwise logistic regression; odds ratios with 95% CIs (statsmodels) | Class weights | Train–test split |
+| [`Src/DT_HAI.py`](Src/DT_HAI.py) | Decision tree, grid search over depth, split, leaf size and class weights | SMOTE + class weights | 5-fold CV on the training set |
+| [`Src/RF_HAI.py`](Src/RF_HAI.py) | Random forest, 100 trees, thresholds 0.1–0.5 | SMOTE + class weights | 5-fold CV on the training set |
+| [`Src/XGBoost.py`](Src/XGBoost.py) | XGBoost, thresholds 0.1–0.5 | SMOTE | 5-fold CV on the training set |
+| [`Src/NN_HAI.py`](Src/NN_HAI.py) | Neural network: two hidden layers (32, 16), ReLU, 50 epochs (Keras) | SMOTE + class weights | Train–test split |
+
+**All scripts share these steps:**
+- missing values imputed, numeric variables standardized, categorical variables one-hot encoded
+- an 80/20 train–test split (`random_state=42`)
+- evaluation by accuracy, sensitivity, specificity, precision, F1 and ROC-AUC
+
+The decision-tree script also exports feature importances, and the logistic-regression script exports odds ratios, both to Excel.
+
+## Main findings
+
+- **Logistic regression** had the best overall accuracy: 95.9% for HA-UTI vs. UTI-free and 93.2% for HA-UTI vs. CA-UTI.
+- **The decision tree** had the highest sensitivity (87%).
+- **The neural network** had the highest specificity (93.4%, HA-UTI vs. CA-UTI).
+- **Random forest** performed best in cross-validation.
+- **AUC** ranged from 71.9% to 94%.
+- **Top predictors:** nurse units, especially inpatient and mental-health units, were the strongest predictors in every model and year. Logistic regression and the decision tree also identified hospital location.
+
+See the article for results by year, task and model.
+
+## Running the code
+
+```bash
+pip install -r requirements.txt
+
+# Run the workflow on synthetic data (no patient data involved)
+python Src/LR_HAI.py example/synthetic_example.xlsx
+
+# Run on your own data
+python Src/LR_HAI.py path/to/your_data.xlsx
+```
+
+Each run analyses one dataset, meaning one task and one year. Output file names written by the scripts (e.g. `LR_HAI_2020.xlsx`) carry a year label that you can edit.
+
+**Input format:** one Excel file with one row per patient and these columns:
+
+| Column | Type | Description |
+|---|---|---|
+| `PATIENT_AGE` | numeric | Age in years |
+| `PATIENT_GENDER` | categorical | Gender |
+| `PATIENT_ETHNICITY` | categorical | Ethnicity |
+| `PATIENT_EMPLOYMENT_STATUS` | categorical | Employment status |
+| `PATIENT_MARITAL_STATUS` | categorical | Marital status |
+| `Poverty` | numeric | Poverty rate of the patient's ZIP code |
+| `Median_Income` | numeric | Median household income of the ZIP code |
+| `Graduate_degree` | numeric | Share of adults with a graduate degree in the ZIP code |
+| `population_density` | numeric | People per square mile in the ZIP code |
+| `New Location` | categorical | Hospital location (grouped) |
+| `New Nurse Unit` | categorical | Nurse unit (grouped) |
+| `H` | 0/1 | Outcome: 1 = HA-UTI |
+
+Missing values are allowed; the scripts impute them.
+
+## Data availability and reproducibility
+
+The 2019–2023 patient data were obtained through Cerner Corporation, Kansas City, and originate from University Health, Kansas City, Missouri. Patient-level health data cannot be shared, so no study data are included here. ZIP-code socioeconomic data came from unitedstateszipcodes.org.
+
+- **To run the workflow:** as the article describes, the code can be run on a hypothetical dataset. [`example/synthetic_example.xlsx`](example/) is randomly generated by [`example/make_synthetic_data.py`](example/make_synthetic_data.py). It is not derived from the study data, and results on it have no clinical meaning.
+- **To reproduce the published results:** the same cohort is needed. It is available only to researchers with access to these records under a data use agreement.
+
+Changes made to the code since publication are listed in [`CHANGES.md`](CHANGES.md).
+
+## Citation
+
+Please cite the article above. A [`CITATION.cff`](CITATION.cff) file is included.
+
+Contact: [Arash Arjmand, PhD](https://sites.google.com/view/arash-arjmand)

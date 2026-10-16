@@ -1,0 +1,9 @@
+pandas>=1.5
+numpy>=1.23
+openpyxl>=3.0
+scikit-learn>=1.2   # OneHotEncoder(sparse_output=...) needs 1.2 or later
+imbalanced-learn>=0.10
+xgboost>=1.7
+statsmodels>=0.13
+tensorflow>=2.10    # neural-network script only
+matplotlib>=3.6

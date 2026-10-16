@@ -18,7 +18,10 @@ import matplotlib.pyplot as plt
 from sklearn.impute import SimpleImputer
 
 # Load the data
-file_path = r'C:\Users\...
+import sys
+if len(sys.argv) < 2:
+    sys.exit(f'Usage: python {sys.argv[0]} <data.xlsx>')
+file_path = sys.argv[1]
 data = pd.read_excel(file_path)
 
 # Define predictors and target variable
